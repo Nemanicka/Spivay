@@ -1,0 +1,38 @@
+{
+  "name": "Constant Context",
+  "description" : "Highlights elements with keywords on developer.chrome",
+  "version": "1.0",
+  "page_action": {
+  "default_icon": {
+    "16": "images/get_started16.png",
+    "32": "images/get_started32.png"
+  },
+  "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "images/get_started16.png",
+    "48": "images/get_started48.png",
+    "32": "images/get_started32.png",
+    "128": "images/get_started128.png"
+  },
+  "permissions": [
+    "https://twitter.com/*",
+    "tabs",
+    "activeTab",
+    "storage",
+    "declarativeContent"
+  ],
+  "manifest_version": 2,
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "web_accessible_resources": ["style.css"],
+  "content_scripts": [
+  {
+  "js": ["jquery.min.js", "content_script.js", "jquery.js"],
+  "matches": ["https://twitter.com/*", "http://www.twitter.com/*"],
+  "run_at": "document_end"
+  }
+  ]
+}
