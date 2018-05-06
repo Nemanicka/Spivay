@@ -3,24 +3,25 @@
 // found in the LICENSE file.
 
 
-var input = $('#Tweetstorm-tweet-box-0');
-var inputFooters = $(input).find(".tweet-box-extras");
+var inputBoxes = $('.TweetstormDialog-tweet-box');
+for (var i=0; i<inputBoxes.length; ++i) {
+  var input = inputBoxes[i];
+  var inputFooters = $(input).find(".tweet-box-extras");
 
-if (inputFooters.length == 1) {
-  var inputFooter = inputFooters[0];
-  if (!$(inputFooter).hasClass("nightingaled")) {
-    $(inputFooter).addClass("nightingaled");
-    $(inputFooter).append("<span class='TweetBoxExtras-item'> <div> <button id='nightPlay' class='btn icon-btn js-tooltip' type='button'> Play </button> </div> </span>");
+  if (inputFooters.length == 1) {
+    var inputFooter = inputFooters[0];
+    if (!$(inputFooter).hasClass("nightingaled")) {
+      $(inputFooter).addClass("nightingaled");
+      $(inputFooter).append("<span class='TweetBoxExtras-item'> <div> <button class='nightPlay' class='btn icon-btn js-tooltip' type='button'> Play </button> </div> </span>");
+    }
   }
 }
 
-chrome.runtime.sendMessage({message: "listeners", function (response) {
-
+chrome.runtime.sendMessage({message: {code: "listeners"}, function (response) {
+  console.log("res = ", response)
   }
-}); 
+});
 
-
-//deal with newly loaded tweets
 function DOMModificationHandler(){
   $(this).unbind('DOMSubtreeModified.event1');
   setTimeout(function(){
@@ -32,7 +33,6 @@ function DOMModificationHandler(){
 $('#timeline').bind('DOMSubtreeModified.event1', DOMModificationHandler);
 
 function modify(){
-  //find and modify tall tweets
   $('.tweet').each(function(index){
     var t = $(this).find(".tweet-text");
     if (!t.length) return;
@@ -43,13 +43,5 @@ function modify(){
       $(footer).addClass("nightingaled");
       $(footer).append("<div class='ProfileTweet-action ProfileTweet-action--dm'> <button class='ProfileTweet-actionButton u-textUserColorHover js-actionButton '> Play </button> </div>");
     }
- //   console.log("tweet");
- //   var len = t.split(/\r\n|\r|\n/).length;
- // if(!$(this).hasClass("squished") && len > threshold){
- //   $(this).addClass("squished");
- //   $(this).html(`<button class="squish-button EdgeButton EdgeButton--primary" data-original-content="${encodeURI(t)}">Show Long Tweet</button>`);
-  //if we add a new button, we have to add listeners again...
-    //chrome.runtime.sendMessage({message: "listeners"}, function(response) {
-    //});
   });
 }

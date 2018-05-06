@@ -24,7 +24,7 @@
   ],
   "manifest_version": 2,
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["background.js", "Tone.js", "StartAudioContext.js", "Rhythm.js", "instruments.js"],
     "persistent": false
   },
   "web_accessible_resources": ["style.css"],
