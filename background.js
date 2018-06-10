@@ -4,6 +4,8 @@
 
 'use strict';
 
+
+
 // #spivay piano 4E4 4B4 4B4 4G4 4F#4 4F#4 4F#4 8F#4 8G4 4E4
 // #spivay piano 4E4 4B4 4B4 4G4 4G4 4E2
 
@@ -16,7 +18,7 @@
 
 ///#spivay piano 2E4 2A3 8C4 8D4 2E4 2A3 8C4 8D4 4B3 4E3 8G3 8A3 4B3 4E3 8G3 8A3 4B3 4E3 8G3 8A3 4B3 4E3 4E3 2D4 2G3 8C4 8B3 2D4 2G3 8C4 8B3 4A3 4E3 8F3 8G3 4A3 4E3 8F3 8G3 4A3 4E3 8F3 8G3 2A3
 
-///#spivay piano 1A2 4A2 1A2 4A2 1E2 1E2 1E2 1G2 4G2 1G2 4G2 2A2 4A2 2A2 4A2 2A2 4A2 2A2 2A2 
+///#spivay piano 1A2 4A2 1A2 4A2 1E2 1E2 1E2 1G2 4G2 1G2 4G2 2A2 4A2 2A2 4A2 2A2 4A2 2A2 2A2
 
 var allowedNotes = {
   "A" : 1,
@@ -41,6 +43,9 @@ var allowedNotes = {
   "G#" : 1,
   "GB" : 1
 }
+
+
+
 
 var checkNote = function (input) {
   /// The first char should be digit denoting the length of the note
@@ -85,6 +90,8 @@ var checkNote = function (input) {
   return true;
 };
 
+
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (!request.message.code) {
@@ -95,116 +102,79 @@ chrome.runtime.onMessage.addListener(
       var ctx = new AudioContext();
       Tone.setContext(ctx);
       console.log("playing");
-      for (let x=0; x<request.message.melodies.length; ++x) {
-        let synth = new Tone.PolySynth(request.message.melodies.length, Tone.Synth).toMaster();
-        let melody = request.message.melodies[x];
-        if (melody.length < 3) {
-          return;
-        }
 
-        // function triggerSynth(note, dur, time){
-        //   console.log(note, dur, time);
-        //   if (note.length === 1) {
-        //     // synth.triggerAttackRelease(null,  dur, time);
-        //   } else {
-        //     synth.triggerAttackRelease(note, dur, time);
-        //   }
-        // }
+      let orderedMelodies = {};
+      Object.keys(request.message.melodies).sort().forEach(function(key) {
+        orderedMelodies[key] = request.message.melodies[key];
+      });
 
-        // let instrument = melody[1];
-        //
-        let delay = 0;
+      console.log(orderedMelodies);
+      let duration = 0;
+      let partDelay = 0;
+      let incrementDelay = 0;
+      for (let part in orderedMelodies) {
+        partDelay += incrementDelay;
+        for (let x=0; x<orderedMelodies[part].length; ++x) {
+          let synth = new Tone.PolySynth(orderedMelodies[part].length, Tone.Synth).toMaster();
+          let melody = orderedMelodies[part][x];
+          console.log("Melody = ", melody);
 
-        // console.log(melody);
-
-        let normilizedMelody = [];
-        for (let i = 2; i<melody.length; ++i) {
-          if (!checkNote(melody[i])) {
-            continue;
+          if (melody.length < 3) {
+            console.log("Less then 3 melody tokens");
+            return;
           }
-          let note = melody[i].slice(1);
+          let delay = 0;
 
-          let obj = {
-            time: delay,
-            note: note,
-            duration: melody[i][0] + "n",
-            velocity: 0.7
+          let normilizedMelody = [];
+          for (let i = 2; i<melody.length; ++i) {
+            if (!checkNote(melody[i])) {
+              continue;
+            }
+            let note = melody[i].slice(1);
+
+            let obj = {
+              time: delay,
+              note: note,
+              duration: melody[i][0] + "n",
+              velocity: 1
+            }
+
+            normilizedMelody.push(obj);
+            delay += Tone.Time(melody[i][0] + "n").toSeconds();
           }
 
-          normilizedMelody.push(obj);
-          delay += Tone.Time(melody[i][0] + "n").toSeconds();
+          var part1 = new Tone.Part(function(time, value) {
+            synth.triggerAttackRelease(value.note, value.duration, time, value.velocity);
+          }, normilizedMelody ).start(partDelay);
+
+          if (x === 0) {
+            incrementDelay += delay;
+          }
+
+          duration += incrementDelay;
         }
-
-        var part1 = new Tone.Part(function(time, value) {
-          synth.triggerAttackRelease(value.note, value.duration, time, value.velocity);
-          // console.log(value);
-          // if (!checkNote(value)) {
-          //   return;
-          // }
-          // let note = value.slice(1);
-          // synth.triggerAttackRelease(note, value[0] + "n", time);
-          // delay += Tone.Time(value[0] + "n").toSeconds();
-        }, normilizedMelody ).start(0);
-
-        // for (let i = 2; i<melody.length; ++i) {
-        //   if (!checkNote(melody[i])) {
-        //     continue;
-        //   }
-        //   let note = melody[i].slice(1);
-        //   Tone.Transport.schedule(triggerSynth(note, melody[i][0] + "n", delay));
-        //   delay += Tone.Time(melody[i][0] + "n").toSeconds();
-        // }
       }
+      // Tone.Transport.bpm.rampTo(240, 0);
+      // console.log("started xxx", typeof(duration), typeof(duration*500));
+      sendResponse({duration: duration*500});
+      // sendResponse({message: "Started2"});
 
-      // Tone.Transport.start("+0.1");
+      Tone.Transport.start();
+    }
 
-
-      // let HeyHoNotes = ["D4","C4","D4","D4","D4","A3",  "D4","D4","E4","E4","F4","F4","F4","F4","E4",   "A4","G4","A4","G4","A4","G4","A4","G4","F4","E4"];
-      // let HeyHoDurations = ["2n","2n","4n","8n","8n","2n", "4n","4n","4n","4n","8n","8n","8n","8n","2n","4n+8n","8n","4n+8n","8n","4n+8n","8n","8n","8n","8n","8n"];
-      // let HeHoVelocity = [0.9,0.9,0.9,0.7,0.7,0.9,  0.9,0.7,0.9,0.7,0.9,0.7,0.7,0.7,0.9,   0.9,0.7,0.9,0.7,0.9,0.7,0.9,0.7,0.7,0.7];
-      //
-      // var HeyHoMelody = Rhythm.mergeDurationVelocityAndPitch(HeyHoDurations, HeyHoNotes, HeHoVelocity);
-      // console.log(HeyHoMelody);
-      // let synth1 = new Tone.PolySynth(request.message.melodies.length, Tone.Synth).toMaster();
-      //
-      // var heyHoPart1 = new Tone.Part(function(time, value){
-      //     // synth1.triggerAttackRelease(value.note, value.duration, time, value.velocity)
-      // }, HeyHoMelody ).start(0);
-      // instruments.electricCello.volume.value = -5;
-
-      // let synth2 = new Tone.PolySynth(request.message.melodies.length, Tone.Synth).toMaster();
-      // var heyHoPart2 = new Tone.Part(function(time, value){
-      //     synth2.triggerAttackRelease(value.note, value.duration, time, value.velocity)
-      // }, HeyHoMelody ).start(0);
-
-      // offset 4 bars
-      // var heyHoPart3 = new Tone.Part(function(time, value){
-      //     instruments.steelPan.triggerAttackRelease(value.note, value.duration, time, value.velocity)
-      // }, HeyHoMelody ).start("4*1m");
-      // instruments.steelPan.volume.value = -10;
-
-      //TRANSPORT
-      // heyHoPart1.loopStart = "0";
-      // heyHoPart1.loopEnd = "6:0";
-      // heyHoPart1.loop = 3;
-      //
-      // // still play 6 bars (but start 2 bars late)
-      // heyHoPart2.loopStart = "0";
-      // heyHoPart2.loopEnd = "6:0";
-      // heyHoPart2.loop = 3;
-      //
-      // // still play 6 bars (but start 4 bars late)
-      // heyHoPart3.loopStart = "0";
-      // heyHoPart3.loopEnd = "6:0";
-      // heyHoPart3.loop = 3;
-
-      // Tone.Transport.bpm.value = 170;
-      Tone.Transport.start("+0.1");
+    if (request.message.code === "stop"){
+      console.log("stop...");
+      Tone.Transport.stop();
+      sendResponse({message: "Stopped"});
     }
 
     if (request.message.code === "listeners"){
-      chrome.tabs.executeScript(null, {file: "injected_script.js"});
-      sendResponse({message: "OK"});
+      console.log("exec...");
+
+      // chrome.tabs.executeScript(null, { file: "widgets.js" }, function() {
+        // console.log("going to exec...");
+        chrome.tabs.executeScript(null, {file: "injected_script.js"});
+      // });
     }
   }
 );
