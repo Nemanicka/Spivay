@@ -5,48 +5,7 @@ var instruments = {
 };
 
 
-console.log("Injected 3");
-
-var backToPlay = null;
-
-var inputReplyBoxes = document.getElementsByClassName('inline-reply-tweetbox-container');
-console.log("input reply boxes = ", inputReplyBoxes.length);
-for (let i=0; i<inputReplyBoxes.length; ++i) {
-  // let id = inputBoxes[i].getAttribute("id");
-  let btns = inputReplyBoxes[i].getElementsByClassName("nightPlay");
-  console.log("replies = ", btns.length);
-  if (btns.length != 1 || (btns[0].className.indexOf("listening") != -1)) {
-    continue;
-  }
-
-  console.log( "reply", btns[0].className);
-
-  btns[0].classList.add("listening");
-
-  btns[0].addEventListener('click', function() {
-    let texts = [];
-    let newTweets = document.getElementsByClassName('TweetstormDialog-tweet-box');
-    for (let j=0; j<newTweets.length; ++j) {
-      let textareas = newTweets[j].getElementsByClassName("tweet-box");
-
-      if (textareas.length != 1) continue;
-
-      if (!textareas[0] ||
-          !textareas[0].children ||
-          !textareas[0].children[0])
-          continue;
-
-      let text = textareas[0].children[0].innerText;
-      texts.push(text);
-    }
-
-    parseTexts(texts);
-  });
-}
-
-console.log("Injected 1");
-
-var parseTexts = function (params, btnsDiv) {
+var parseTexts = function (params) {
   if (!params) {
     return;
   }
@@ -126,16 +85,135 @@ var parseTexts = function (params, btnsDiv) {
 
   console.log("trying to play...", melodies);
   chrome.runtime.sendMessage({message: {code: "play", melodies: melodies}}, function (response) {
-    btnsDiv.children[0].hidden = true;
-    btnsDiv.children[1].hidden = false;
+    params.element.children[0].hidden = true;
+    params.element.children[1].hidden = false;
 
     backToPlay = setTimeout(function () {
-      btnsDiv.children[1].hidden = true;
-      btnsDiv.children[0].hidden = false;
+      params.element.children[1].hidden = true;
+      params.element.children[0].hidden = false;
     }, response.duration);
     console.log(response.duration);
   });
 }
+
+var backToPlay = null;
+
+var getTweetsParams = function (link) {
+  let url = "https://twitter.com" + link;
+  console.log(url);
+  let xmlHttp = new XMLHttpRequest();
+  xmlHttp.open( "GET", url, false );
+  xmlHttp.send( null );
+
+  let parser = new DOMParser();
+  let response = parser.parseFromString(xmlHttp.responseText, "text/html");
+  // let response = document.implementation.createDocument(xmlHttp.responseText, xmlHttp.responseText, null);
+  let current     = response.getElementsByClassName("permalink-tweet-container");
+  let currentBox  = current[0].getElementsByClassName("tweet-text");
+  let inReplyTo   = response.getElementsByClassName("permalink-in-reply-tos");
+  let replyBoxes  = [];
+  if (inReplyTo.length) {
+    replyBoxes = inReplyTo[0].getElementsByClassName("tweet-text");
+  }
+
+  let texts = [];
+  for (let i=0; i<currentBox.length; ++i) {
+    let text = currentBox[i].innerText;
+    texts.push(text);
+  }
+
+  for (let i=0; i<replyBoxes.length; ++i) {
+    let text = replyBoxes[i].innerText;
+    texts.push(text);
+  }
+
+  return {texts: texts, self: null, mode: 1};
+}
+
+
+var inputReplyBoxes = document.getElementsByClassName('inline-reply-tweetbox-container');
+console.log("input reply boxes = ", inputReplyBoxes.length);
+for (let i=0; i<inputReplyBoxes.length; ++i) {
+  // let id = inputBoxes[i].getAttribute("id");
+  let userHolder = inputReplyBoxes[i].getElementsByClassName("username u-dir u-textTruncate");
+  console.log("children = ", userHolder);
+  if (!userHolder[0] || !userHolder[0].children || !userHolder[0].children[0]) {
+    continue;
+  }
+  let user = userHolder[0].children[0].innerText;
+  let idHolder = inputReplyBoxes[i].getElementsByClassName("tweet-form is-reply");
+  if (!idHolder[0]) continue;
+  let id = idHolder[0].getAttribute("data-previous-status-id-in-thread");
+  let link = "/" + user + "/status/" + id;
+
+  // let id = inputReplyBoxes[i].getAttribute("id");
+  let btns = inputReplyBoxes[i].getElementsByClassName("nightPlay");
+
+  if (btns.length != 3) {
+    continue;
+  }
+
+  //// -------
+  let stopBtns = btns[0].parentElement.parentElement.children[1].children;
+  console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);
+  if (stopBtns.length != 1 || (stopBtns[0].className.indexOf("nightListening") != -1)) {
+    console.log("continue");
+    continue;
+  }
+
+  stopBtns[0].classList.add("nightListening");
+
+  stopBtns[0].addEventListener('click', function() {
+    chrome.runtime.sendMessage({message: {code: "stop"}}, function (response) {
+      console.log("sent stop code");
+      stopBtns[0].parentElement.parentElement.children[0].hidden = false;
+      stopBtns[0].parentElement.parentElement.children[1].hidden = true;
+      if (backToPlay) {
+        clearTimeout(backToPlay);
+      }
+    });
+  });
+  //// -------
+  for (let k=0; k<btns.length; ++k) {
+    if (btns[k].className.indexOf("listening") != -1) {
+      continue;
+    }
+    console.log(btns[k].className);
+
+    btns[k].classList.add("listening");
+
+    btns[k].addEventListener('click', function() {
+
+      let tweetHolder = inputReplyBoxes[i].getElementsByClassName("tweet-box rich-editor");
+      if (!tweetHolder[0] || !tweetHolder[0].children || !tweetHolder[0].children[0]) {
+        return;
+      }
+
+      let tweetText = tweetHolder[0].children[0].innerText;
+
+      let params = getTweetsParams(link);
+      if (btns[k].className.indexOf("nightPlayAll") != -1) {
+        params.mode = 1;
+      }
+      if (btns[k].className.indexOf("nightPlayPart") != -1) {
+        params.mode = 2;
+      }
+      if (btns[k].className.indexOf("nightPlaySelf") != -1) {
+        params.mode = 3;
+      }
+
+      params.element = btns[0].parentElement.parentElement;
+      console.log("tweetText", tweetText);
+      params.self = tweetText;
+      params.texts.push(tweetText);
+      parseTexts(params);
+    });
+  }
+}
+
+console.log("Injected 1");
+
+
 
 console.log("Injected 2");
 
@@ -220,10 +298,12 @@ for (let i=0; i<inputBoxes.length; ++i) {
       }
 
       params.texts = texts;
-      parseTexts(params, btns[0].parentElement.parentElement);
+      params.element =  btns[0].parentElement.parentElement;
+      parseTexts(params);
     });
   }
 }
+
 
 
 var inputTweetBoxes = document.getElementsByClassName('tweet');
@@ -235,13 +315,6 @@ for (let i=0; i<inputTweetBoxes.length; ++i) {
   console.log(link);
   let divs = inputTweetBoxes[i].getElementsByClassName("nightFooterDiv");
   let btns = inputTweetBoxes[i].getElementsByClassName("nightPlay");
-  // if (!playDiv || !playDiv.children || playDiv.children.length != 2 ) {
-  //   console.log(playDiv );
-  //   continue;
-  // }
-
-  // let btns = playDiv.children[0].children;
-  // console.log("btns.length", btns.length);
 
   if (btns.length != 1 || (btns[0].className.indexOf("nightListening") != -1)) {
     continue;
@@ -251,38 +324,10 @@ for (let i=0; i<inputTweetBoxes.length; ++i) {
 
   btns[0].classList.add("nightListening");
   btns[0].addEventListener('click', function() {
-    let url = "https://twitter.com" + link;
-    console.log(url);
-    let xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", url, false );
-    xmlHttp.send( null );
-
-    let parser = new DOMParser();
-    let response = parser.parseFromString(xmlHttp.responseText, "text/html");
-    // let response = document.implementation.createDocument(xmlHttp.responseText, xmlHttp.responseText, null);
-    let current     = response.getElementsByClassName("permalink-tweet-container");
-    let currentBox  = current[0].getElementsByClassName("tweet-text");
-    let inReplyTo   = response.getElementsByClassName("permalink-in-reply-tos");
-    let replyBoxes  = [];
-    if (inReplyTo.length) {
-      replyBoxes = inReplyTo[0].getElementsByClassName("tweet-text");
-    }
-
-    let texts = [];
-    for (let i=0; i<currentBox.length; ++i) {
-      let text = currentBox[i].innerText;
-      texts.push(text);
-    }
-
-    for (let i=0; i<replyBoxes.length; ++i) {
-      let text = replyBoxes[i].innerText;
-      texts.push(text);
-    }
-
-    parseTexts({texts: texts, self: null, mode: 1}, btns[0].parentElement.parentElement);
+    let params = getTweetsParams(link);
+    params.element = btns[0].parentElement.parentElement;
+    parseTexts(params);
   });
-
-
 
   let stopBtns = btns[0].parentElement.parentElement.children[1].children;
   console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);

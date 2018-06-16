@@ -113,7 +113,7 @@ chrome.runtime.onMessage.addListener(
       let partDelay = 0;
       let incrementDelay = 0;
       for (let part in orderedMelodies) {
-        partDelay += incrementDelay;
+
         for (let x=0; x<orderedMelodies[part].length; ++x) {
           let synth = new Tone.PolySynth(orderedMelodies[part].length, Tone.Synth).toMaster();
           let melody = orderedMelodies[part][x];
@@ -148,15 +148,15 @@ chrome.runtime.onMessage.addListener(
           }, normilizedMelody ).start(partDelay);
 
           if (x === 0) {
-            incrementDelay += delay;
+            incrementDelay = delay;
           }
-
-          duration += incrementDelay;
+          console.log("adding", incrementDelay);
         }
+        partDelay += incrementDelay;
       }
       // Tone.Transport.bpm.rampTo(240, 0);
       // console.log("started xxx", typeof(duration), typeof(duration*500));
-      sendResponse({duration: duration*500});
+      sendResponse({duration: partDelay*1000});
       // sendResponse({message: "Started2"});
 
       Tone.Transport.start();
