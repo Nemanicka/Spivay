@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-var playFooterHtml = "<span class='TweetBoxExtras-item'> <div class='play-div'> <span> Play: </span> <button class='nightPlayAll' \
-class='btn icon-btn js-tooltip' type='button'> All </button> <button class='nightPlayPart' class='btn icon-btn \
-js-tooltip' type='button'> Part </button> <button class='nightPlaySelf' class='btn icon-btn js-tooltip' type='button'> \
-Self </button> </div> </span>";
+var playFooterHtml = "<span class='TweetBoxExtras-item'> <div class='play-div'> <span> Play: </span> <button class='nightPlay nightPlayAll' \
+class='btn icon-btn js-tooltip' type='button'> All </button> <button class='nightPlay nightPlayPart' class='btn icon-btn \
+js-tooltip' type='button'> Part </button> <button class='nightPlay nightPlaySelf' class='btn icon-btn js-tooltip' type='button'> \
+Self </button> </div>";
 
-var stopFooterHtml = "<span class='TweetBoxExtras-item'> <div class='stop-div' > <button class='nightStop' \
+var stopFooterHtml = "<div class='stop-div' hidden> <button class='nightStop' \
 class='btn icon-btn js-tooltip' type='button'> Stop </button> </div> </span>";
 
 var inputBoxes = $('.TweetstormDialog-tweet-box');
@@ -19,8 +19,7 @@ for (var i=0; i<inputBoxes.length; ++i) {
     var inputFooter = inputFooters[0];
     if (!$(inputFooter).hasClass("nightingaled")) {
       $(inputFooter).addClass("nightingaled");
-      $(inputFooter).append(playFooterHtml);
-      $(inputFooter).append(stopFooterHtml);
+      $(inputFooter).append(playFooterHtml + stopFooterHtml);
     }
   }
 }
@@ -39,8 +38,7 @@ function ReplyModifier() {
         console.log("modify reply");
         modifiedReply = true;
         $(inputFooter).addClass("nightingaled");
-        $(inputFooter).append(playFooterHtml);
-        $(inputFooter).append(stopFooterHtml);
+        $(inputFooter).append(playFooterHtml + stopFooterHtml);
       }
     }
   }

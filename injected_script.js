@@ -46,10 +46,40 @@ for (let i=0; i<inputReplyBoxes.length; ++i) {
 
 console.log("Injected 1");
 
-var parseTexts = function (texts, btnsDiv) {
+var parseTexts = function (params, btnsDiv) {
+  if (!params) {
+    return;
+  }
+
+  let texts = params.texts;
+  console.log(params);
   melodies = {
     '0': []
   };
+
+  if (params.mode === 3) {
+    texts = [params.self];
+  }
+
+  let playPart = -1;
+  if (params.mode === 2 && params.self) {
+    let n = params.self.search(/#spivay/i);
+    if (n !== -1) {
+      let melody = params.self.substr(n);
+      let tokens = melody.split(' ');
+      if (tokens.length >= 3) {
+        let meta = tokens[1].split('_');
+        if (instruments[meta[0]] === 1) {
+          if (meta.length !== 1) {
+            playPart = parseInt(meta[1]);
+          } else {
+            playPart = 0;
+          }
+          console.log("part = ", playPart);
+        }
+      }
+    }
+  }
 
   for (let i=0; i<texts.length; ++i) {
     if (!texts[i]) continue;
@@ -72,16 +102,25 @@ var parseTexts = function (texts, btnsDiv) {
     }
 
     if (meta.length === 1) {
-      melodies['0'].push(tokens);
+      if (params.mode !== 2 || playPart === 0) {
+        melodies['0'].push(tokens);
+      }
     } else {
       let accomp = parseInt(meta[1]);
       if (!accomp) {
         continue;
       }
-      if (!melodies[meta[1]]) {
-        melodies[meta[1]] = [];
+
+      if (params.mode !== 2) {
+        if (!melodies[meta[1]]) {
+          melodies[meta[1]] = [];
+        }
+        melodies[meta[1]].push(tokens);
+      } else {
+        if (accomp === playPart) {
+          melodies['0'].push(tokens);
+        }
       }
-      melodies[meta[1]].push(tokens);
     }
   }
 
@@ -105,33 +144,85 @@ console.log("regular box size = ", inputBoxes.length);
 for (let i=0; i<inputBoxes.length; ++i) {
   let id = inputBoxes[i].getAttribute("id");
   let btns = inputBoxes[i].getElementsByClassName("nightPlay");
-  if (btns.length != 1 || (btns[0].className.indexOf("listening") != -1)) {
+
+  if (btns.length != 3) {
     continue;
   }
 
-  console.log(btns[0].className);
+  let stopBtns = btns[0].parentElement.parentElement.children[1].children;
+  console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);
+  if (stopBtns.length != 1 || (stopBtns[0].className.indexOf("nightListening") != -1)) {
+    console.log("continue");
+    continue;
+  }
 
-  btns[0].classList.add("listening");
+  stopBtns[0].classList.add("nightListening");
 
-  btns[0].addEventListener('click', function() {
-    let texts = [];
-    let newTweets = document.getElementsByClassName('TweetstormDialog-tweet-box');
-    for (let j=0; j<newTweets.length; ++j) {
-      let textareas = newTweets[j].getElementsByClassName("tweet-box");
-
-      if (textareas.length != 1) continue;
-
-      if (!textareas[0] ||
-          !textareas[0].children ||
-          !textareas[0].children[0])
-          continue;
-
-      let text = textareas[0].children[0].innerText;
-      texts.push(text);
-    }
-
-    parseTexts(texts);
+  stopBtns[0].addEventListener('click', function() {
+    chrome.runtime.sendMessage({message: {code: "stop"}}, function (response) {
+      console.log("sent stop code");
+      stopBtns[0].parentElement.parentElement.children[0].hidden = false;
+      stopBtns[0].parentElement.parentElement.children[1].hidden = true;
+      if (backToPlay) {
+        clearTimeout(backToPlay);
+      }
+    });
   });
+
+  for (let k=0; k<btns.length; ++k) {
+    if (btns[k].className.indexOf("listening") != -1) {
+      continue;
+    }
+    console.log(btns[k].className);
+
+    btns[k].classList.add("listening");
+
+    btns[k].addEventListener('click', function() {
+      let texts = [];
+      let newTweets = document.getElementsByClassName('TweetstormDialog-tweet-box');
+      let params = {
+        texts: [],
+        self: null,
+        mode: 0
+      };
+
+      if (btns[k].className.indexOf("nightPlayAll") != -1) {
+        params.mode = 1;
+      }
+
+      if (btns[k].className.indexOf("nightPlayPart") != -1) {
+        params.mode = 2;
+      }
+
+      if (btns[k].className.indexOf("nightPlaySelf") != -1) {
+        params.mode = 3;
+      }
+
+      for (let j=0; j<newTweets.length; ++j) {
+        let textareas = newTweets[j].getElementsByClassName("tweet-box");
+        let tweetId = newTweets[j].getAttribute("id");
+
+        if (textareas.length != 1) continue;
+
+        if (!textareas[0] ||
+            !textareas[0].children ||
+            !textareas[0].children[0])
+            continue;
+
+        let text = textareas[0].children[0].innerText;
+
+        if (tweetId === id) {
+          console.log("ID = ", id, tweetId, text);
+          params.self = text;
+        }
+
+        texts.push(text);
+      }
+
+      params.texts = texts;
+      parseTexts(params, btns[0].parentElement.parentElement);
+    });
+  }
 }
 
 
