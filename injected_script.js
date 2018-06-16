@@ -279,7 +279,7 @@ for (let i=0; i<inputTweetBoxes.length; ++i) {
       texts.push(text);
     }
 
-    parseTexts(texts, btns[0].parentElement.parentElement);
+    parseTexts({texts: texts, self: null, mode: 1}, btns[0].parentElement.parentElement);
   });
 
 
