@@ -94,7 +94,27 @@ if (!tl) {
   $('#timeline').one('DOMSubtreeModified.event1', DOMModificationHandler);
 }
 
-$('#permalink-overlay').one('DOMSubtreeModified', permalinkWatcher);
+function replyWatcher(){
+  // console.log("MODIFIED 1");
+  // $('#permalink-overlay').('dblclick', permalinkWatcher);
+  setTimeout(function() {
+    let replyContext = $('.TweetstormDialog-reply-context');
+    if (replyContext.length === 1) {
+      $(replyContext[0]).one('DOMSubtreeModified.event1', replyWatcher);
+      chrome.runtime.sendMessage({message: {code: "listeners"}, function (response) {
+        console.log("res = ", response);
+        }
+      });
+    }
+  }, 10);
+}
+
+let replyContext = $('.TweetstormDialog-reply-context');
+if (replyContext.length === 1) {
+  $(replyContext[0]).one('DOMSubtreeModified.event1', replyWatcher);
+}
+
+
 
 function modify() {
   // console.log("mod");

@@ -98,8 +98,7 @@ var parseTexts = function (params) {
 
 var backToPlay = null;
 
-var getTweetsParams = function (link) {
-  let url = "https://twitter.com" + link;
+var getTweetsParams = function (url) {
   console.log(url);
   let xmlHttp = new XMLHttpRequest();
   xmlHttp.open( "GET", url, false );
@@ -191,7 +190,7 @@ for (let i=0; i<inputReplyBoxes.length; ++i) {
 
       let tweetText = tweetHolder[0].children[0].innerText;
 
-      let params = getTweetsParams(link);
+      let params = getTweetsParams(window.location.href);
       if (btns[k].className.indexOf("nightPlayAll") != -1) {
         params.mode = 1;
       }
@@ -217,11 +216,29 @@ console.log("Injected 1");
 
 console.log("Injected 2");
 
+var dialogReplyContext = document.getElementsByClassName('TweetstormDialog-reply-context');
+console.log("reply contexts = ", dialogReplyContext.length);
+
+var replyParams = {
+  texts: []
+};
+
+if (dialogReplyContext.length === 1 && (dialogReplyContext[0].className.indexOf("hidden") == -1)) {
+  let replyTweet = dialogReplyContext[0].getElementsByClassName("tweet");
+  console.log("reply tweets = ", replyTweet.length);
+  if (replyTweet.length === 1) {
+    let uri = "https://twitter.com" + replyTweet[0].getAttribute("data-permalink-path");
+    replyParams = getTweetsParams(uri);
+  }
+}
+
+
 var inputBoxes = document.getElementsByClassName('TweetstormDialog-tweet-box');
 console.log("regular box size = ", inputBoxes.length);
 for (let i=0; i<inputBoxes.length; ++i) {
   let id = inputBoxes[i].getAttribute("id");
   let btns = inputBoxes[i].getElementsByClassName("nightPlay");
+
 
   if (btns.length != 3) {
     continue;
@@ -297,8 +314,9 @@ for (let i=0; i<inputBoxes.length; ++i) {
         texts.push(text);
       }
 
-      params.texts = texts;
+      params.texts = replyParams.texts.concat(texts);
       params.element =  btns[0].parentElement.parentElement;
+
       parseTexts(params);
     });
   }
@@ -324,7 +342,7 @@ for (let i=0; i<inputTweetBoxes.length; ++i) {
 
   btns[0].classList.add("nightListening");
   btns[0].addEventListener('click', function() {
-    let params = getTweetsParams(link);
+    let params = getTweetsParams( "https://twitter.com" + link);
     params.element = btns[0].parentElement.parentElement;
     parseTexts(params);
   });
