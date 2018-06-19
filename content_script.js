@@ -94,6 +94,8 @@ if (!tl) {
   $('#timeline').one('DOMSubtreeModified.event1', DOMModificationHandler);
 }
 
+$('#permalink-overlay').one('DOMSubtreeModified', permalinkWatcher);
+
 function replyWatcher(){
   // console.log("MODIFIED 1");
   // $('#permalink-overlay').('dblclick', permalinkWatcher);

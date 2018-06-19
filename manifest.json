@@ -19,12 +19,14 @@
     "https://twitter.com/*",
     "https://publish.twitter.com/*",
     "https://platform.twitter.com/*",
+    "https://github.com/*",
     "tabs",
     "activeTab",
     "storage",
     "declarativeContent"
   ],
   "manifest_version": 2,
+  "content_security_policy": "script-src 'self' https://surikov.github.io/ ; object-src 'self'",
   "background": {
     "scripts": ["background.js", "Tone.js", "StartAudioContext.js", "Rhythm.js", "instruments.js", "widgets.js"],
     "persistent": false
