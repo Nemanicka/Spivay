@@ -29,7 +29,7 @@
   "content_security_policy": "script-src 'self' https://surikov.github.io/ ; object-src 'self'",
   "background": {
     "scripts": ["background.js", "Tone.js", "StartAudioContext.js", "Rhythm.js", "instruments.js", "widgets.js"],
-    "persistent": false
+    "persistent": true
   },
   "web_accessible_resources": ["style.css"],
   "content_scripts": [

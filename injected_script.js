@@ -1,7 +1,11 @@
 var instruments = {
   piano  : 1,
-  strings: 1,
-  drums  : 1
+  cello: 1,
+  drums  : 1,
+  strings  : 1,
+  dualstrings  : 1,
+  chorusmale : 1,
+  chorusfemale : 1
 };
 
 

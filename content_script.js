@@ -39,12 +39,19 @@ function ReplyModifier() {
         modifiedReply = true;
         $(inputFooter).addClass("nightingaled");
         $(inputFooter).append(playFooterHtml + stopFooterHtml);
+      } else {
+        let buttons = $(inputFooter).find(".nightPlay");
+        for (let j=0; j<buttons.length; ++j) {
+          if (!$(buttons[j]).hasClass("listening")) {
+            modifiedReply = true;
+          }
+        }
       }
     }
   }
 
   if (modifiedReply) {
-    // console.log("modifiedReply res = ", modifiedReply);
+    console.log("modifiedReply res = ", modifiedReply);
     chrome.runtime.sendMessage({message: {code: "listeners"}, function (response) {
       console.log("res = ", response);
       }
@@ -67,12 +74,12 @@ function DOMModificationHandler() {
 }
 
 function permalinkWatcher(){
-  // console.log("MODIFIED 1");
+  console.log("MODIFIED 1");
   // $('#permalink-overlay').('dblclick', permalinkWatcher);
   setTimeout(function() {
     modify();
     ReplyModifier();
-    $('#permalink-overlay').one('DOMSubtreeModified', permalinkWatcher);
+    $('#permalink-overlay').one('DOMSubtreeModified.event1', permalinkWatcher);
   }, 10);
 }
 
@@ -94,7 +101,7 @@ if (!tl) {
   $('#timeline').one('DOMSubtreeModified.event1', DOMModificationHandler);
 }
 
-$('#permalink-overlay').one('DOMSubtreeModified', permalinkWatcher);
+$('#permalink-overlay').one('DOMSubtreeModified.event1', permalinkWatcher);
 
 function replyWatcher(){
   // console.log("MODIFIED 1");
