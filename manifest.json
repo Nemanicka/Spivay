@@ -28,13 +28,13 @@
   "manifest_version": 2,
   "content_security_policy": "script-src 'self' https://surikov.github.io/ ; object-src 'self'",
   "background": {
-    "scripts": ["background.js", "Tone.js", "StartAudioContext.js", "Rhythm.js", "instruments.js", "widgets.js"],
+    "scripts": ["background.js", "Tone.js", "StartAudioContext.js", "Rhythm.js", "instruments.js"],
     "persistent": true
   },
   "web_accessible_resources": ["style.css"],
   "content_scripts": [
   {
-  "js": ["jquery.min.js", "content_script.js", "jquery.js", "js/bootstrap.js"],
+  "js": ["jquery.min.js", "content_script.js"],
   "css": ["css/bootstrap.css"],
   "matches": ["https://twitter.com/*", "http://www.twitter.com/*"],
   "run_at": "document_end"
