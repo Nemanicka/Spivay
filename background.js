@@ -661,7 +661,9 @@ chrome.runtime.onMessage.addListener(
         partDelay += incrementDelay;
       }
       sendResponse({duration: partDelay*1000});
-
+      Tone.Transport.schedule(function (time) {
+        Tone.Transport.stop();
+      }, partDelay);
       // Tone.Transport.on("stop", () => {
         // console.log("STOP");
       // });

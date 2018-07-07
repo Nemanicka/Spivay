@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-var playFooterHtml = "<span class='TweetBoxExtras-item'> <div class='play-div'> <span> Play: </span> <button class='nightPlay nightPlayAll' \
+var playFooterHtml = "<span class='TweetBoxExtras-item'> <div class='play-div'> <span  class='glyphicon glyphicon-play' aria-hidden='true'></span> <button class='nightPlay nightPlayAll' \
 class='btn icon-btn js-tooltip' type='button'> All </button> <button class='nightPlay nightPlayPart' class='btn icon-btn \
 js-tooltip' type='button'> Part </button> <button class='nightPlay nightPlaySelf' class='btn icon-btn js-tooltip' type='button'> \
 Self </button> </div>";
@@ -142,7 +142,7 @@ function modify() {
       $(this).addClass("nightingaledTweet");
       modified = true;
       $(footer).addClass("nightingaled");
-      $(footer).append("<div class='nightFooterDiv ProfileTweet-action ProfileTweet-action--dm'> <div> <button class='ProfileTweet-actionButton nightPlay u-textUserColorHover js-actionButton'> Play </button> </div> <div hidden> <button class='ProfileTweet-actionButton nightStop u-textUserColorHover js-actionButton '> Stop </button> </div> </div>");
+      $(footer).append("<div style='position:absolute; padding-top: 2px;' class='ProfileTweet-action ProfileTweet-action--analytics nightFooterDiv'> <div> <button  class='ProfileTweet-actionButton nightPlay u-textUserColorHover js-actionButton'> <span  class='glyphicon glyphicon-play' aria-hidden='true'></span> </button> </div> <div hidden> <button class='ProfileTweet-actionButton nightStop u-textUserColorHover js-actionButton '>  <span class='glyphicon glyphicon-stop' aria-hidden='true'></span> </button> </div> </div>");
     }
   });
   if (modified) {
