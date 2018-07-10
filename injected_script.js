@@ -15,7 +15,7 @@ var parseTexts = function (params) {
   }
 
   let texts = params.texts;
-  console.log(params);
+  // console.log(params);
   melodies = {
     '0': []
   };
@@ -38,7 +38,7 @@ var parseTexts = function (params) {
           } else {
             playPart = 0;
           }
-          console.log("part = ", playPart);
+          // console.log("part = ", playPart);
         }
       }
     }
@@ -87,7 +87,7 @@ var parseTexts = function (params) {
     }
   }
 
-  console.log("trying to play...", melodies);
+  // console.log("trying to play...", melodies);
   chrome.runtime.sendMessage({message: {code: "play", melodies: melodies}}, function (response) {
     params.element.children[0].hidden = true;
     params.element.children[1].hidden = false;
@@ -96,14 +96,14 @@ var parseTexts = function (params) {
       params.element.children[1].hidden = true;
       params.element.children[0].hidden = false;
     }, response.duration);
-    console.log(response.duration);
+    // console.log(response.duration);
   });
 }
 
 var backToPlay = null;
 
 var getTweetsParams = function (url) {
-  console.log(url);
+  // console.log(url);
   let xmlHttp = new XMLHttpRequest();
   xmlHttp.open( "GET", url, false );
   xmlHttp.send( null );
@@ -135,11 +135,11 @@ var getTweetsParams = function (url) {
 
 
 var inputReplyBoxes = document.getElementsByClassName('inline-reply-tweetbox-container');
-console.log("input reply boxes = ", inputReplyBoxes.length);
+// console.log("input reply boxes = ", inputReplyBoxes.length);
 for (let i=0; i<inputReplyBoxes.length; ++i) {
   // let id = inputBoxes[i].getAttribute("id");
   let userHolder = inputReplyBoxes[i].getElementsByClassName("username u-dir u-textTruncate");
-  console.log("children = ", userHolder);
+  // console.log("children = ", userHolder);
   if (!userHolder[0] || !userHolder[0].children || !userHolder[0].children[0]) {
     continue;
   }
@@ -158,9 +158,9 @@ for (let i=0; i<inputReplyBoxes.length; ++i) {
 
   //// -------
   let stopBtns = btns[0].parentElement.parentElement.children[1].children;
-  console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);
+  // console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);
   if (stopBtns.length != 1 || (stopBtns[0].className.indexOf("nightListening") != -1)) {
-    console.log("continue");
+    // console.log("continue");
     continue;
   }
 
@@ -168,7 +168,7 @@ for (let i=0; i<inputReplyBoxes.length; ++i) {
 
   stopBtns[0].addEventListener('click', function() {
     chrome.runtime.sendMessage({message: {code: "stop"}}, function (response) {
-      console.log("sent stop code");
+      // console.log("sent stop code");
       stopBtns[0].parentElement.parentElement.children[0].hidden = false;
       stopBtns[0].parentElement.parentElement.children[1].hidden = true;
       if (backToPlay) {
@@ -181,7 +181,7 @@ for (let i=0; i<inputReplyBoxes.length; ++i) {
     if (btns[k].className.indexOf("listening") != -1) {
       continue;
     }
-    console.log(btns[k].className);
+    // console.log(btns[k].className);
 
     btns[k].classList.add("listening");
 
@@ -206,7 +206,7 @@ for (let i=0; i<inputReplyBoxes.length; ++i) {
       }
 
       params.element = btns[0].parentElement.parentElement;
-      console.log("tweetText", tweetText);
+      // console.log("tweetText", tweetText);
       params.self = tweetText;
       params.texts.push(tweetText);
       parseTexts(params);
@@ -214,14 +214,8 @@ for (let i=0; i<inputReplyBoxes.length; ++i) {
   }
 }
 
-console.log("Injected 1");
-
-
-
-console.log("Injected 2");
-
 var dialogReplyContext = document.getElementsByClassName('TweetstormDialog-reply-context');
-console.log("reply contexts = ", dialogReplyContext.length);
+// console.log("reply contexts = ", dialogReplyContext.length);
 
 var replyParams = {
   texts: []
@@ -229,7 +223,7 @@ var replyParams = {
 
 if (dialogReplyContext.length === 1 && (dialogReplyContext[0].className.indexOf("hidden") == -1)) {
   let replyTweet = dialogReplyContext[0].getElementsByClassName("tweet");
-  console.log("reply tweets = ", replyTweet.length);
+  // console.log("reply tweets = ", replyTweet.length);
   if (replyTweet.length === 1) {
     let uri = "https://twitter.com" + replyTweet[0].getAttribute("data-permalink-path");
     replyParams = getTweetsParams(uri);
@@ -238,7 +232,7 @@ if (dialogReplyContext.length === 1 && (dialogReplyContext[0].className.indexOf(
 
 
 var inputBoxes = document.getElementsByClassName('TweetstormDialog-tweet-box');
-console.log("regular box size = ", inputBoxes.length);
+// console.log("regular box size = ", inputBoxes.length);
 for (let i=0; i<inputBoxes.length; ++i) {
   let id = inputBoxes[i].getAttribute("id");
   let btns = inputBoxes[i].getElementsByClassName("nightPlay");
@@ -249,9 +243,9 @@ for (let i=0; i<inputBoxes.length; ++i) {
   }
 
   let stopBtns = btns[0].parentElement.parentElement.children[1].children;
-  console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);
+  // console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);
   if (stopBtns.length != 1 || (stopBtns[0].className.indexOf("nightListening") != -1)) {
-    console.log("continue");
+    // console.log("continue");
     continue;
   }
 
@@ -259,7 +253,7 @@ for (let i=0; i<inputBoxes.length; ++i) {
 
   stopBtns[0].addEventListener('click', function() {
     chrome.runtime.sendMessage({message: {code: "stop"}}, function (response) {
-      console.log("sent stop code");
+      // console.log("sent stop code");
       stopBtns[0].parentElement.parentElement.children[0].hidden = false;
       stopBtns[0].parentElement.parentElement.children[1].hidden = true;
       if (backToPlay) {
@@ -272,7 +266,7 @@ for (let i=0; i<inputBoxes.length; ++i) {
     if (btns[k].className.indexOf("listening") != -1) {
       continue;
     }
-    console.log(btns[k].className);
+    // console.log(btns[k].className);
 
     btns[k].classList.add("listening");
 
@@ -311,7 +305,7 @@ for (let i=0; i<inputBoxes.length; ++i) {
         let text = textareas[0].children[0].innerText;
 
         if (tweetId === id) {
-          console.log("ID = ", id, tweetId, text);
+          // console.log("ID = ", id, tweetId, text);
           params.self = text;
         }
 
@@ -334,7 +328,7 @@ for (let i=0; i<inputTweetBoxes.length; ++i) {
   inputTweetBoxes[i].classList.remove("nightingaledTweet");
   let id =   inputTweetBoxes[i].getAttribute("data-tweet-id");
   let link = inputTweetBoxes[i].getAttribute("data-permalink-path");
-  console.log(link);
+  // console.log(link);
   let divs = inputTweetBoxes[i].getElementsByClassName("nightFooterDiv");
   let btns = inputTweetBoxes[i].getElementsByClassName("nightPlay");
 
@@ -342,7 +336,7 @@ for (let i=0; i<inputTweetBoxes.length; ++i) {
     continue;
   }
 
-  console.log("got a button, parent = ", btns[0].parentElement.parentElement.children[1].children[0]);
+  // console.log("got a button, parent = ", btns[0].parentElement.parentElement.children[1].children[0]);
 
   btns[0].classList.add("nightListening");
   btns[0].addEventListener('click', function() {
@@ -352,7 +346,7 @@ for (let i=0; i<inputTweetBoxes.length; ++i) {
   });
 
   let stopBtns = btns[0].parentElement.parentElement.children[1].children;
-  console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);
+  // console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);
   if (stopBtns.length != 1 || (stopBtns[0].className.indexOf("nightListening") != -1)) {
     console.log("continue");
     continue;

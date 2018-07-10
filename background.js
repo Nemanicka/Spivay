@@ -16,10 +16,6 @@
 /// GOT
 ///#spivay piano 2E4 2A3 8C4 8D4 2E4 2A3 8C4 8D4 4B3 4E3 8G3 8A3 4B3 4E3 8G3 8A3 4B3 4E3 8G3 8A3 4B3 4E3 4E3 2D4 2G3 8C4 8B3 2D4 2G3 8C4 8B3 4A3 4E3 8F3 8G3 4A3 4E3 8F3 8G3 4A3 4E3 8F3 8G3 2A3
 
-// #spivay piano 2E4 2A3 8C4 8D4 2E4 2A3 8C4 8D4 4B3 4E3 8G3 8A3 4B3 4E3 8G3 8A3 4B3 4E3 8G3 8A3 4B3 4E3 8G3 4A3 4D3
-
-///#spivay piano 2E4 2A3 8C4 8D4 2E4 2A3 8C4 8D4 4B3 4E3 8G3 8A3 4B3 4E3 8G3 8A3 4B3 4E3 8G3 8A3 4B3 4E3 4E3 2D4 2G3 8C4 8B3 2D4 2G3 8C4 8B3 4A3 4E3 8F3 8G3 4A3 4E3 8F3 8G3 4A3 4E3 8F3 8G3 2A3
-
 ///#spivay piano 1A2 4A2 1A2 4A2 1E2 1E2 1E2 1G2 4G2 1G2 4G2 2A2 4A2 2A2 4A2 2A2 4A2 2A2 2A2
 
 var allowedNotes = {
@@ -46,48 +42,57 @@ var allowedNotes = {
   "GB" : 1
 }
 
+/// #spivay piano 3E4 3A3 16C4 16D4 4E4 4A3 8C4 8D4 4E4 4A3 8C4 8D4 2E4
 
-var checkNote = function (input) {
+var parseNote = function (input) {
   /// The first char should be digit denoting the length of the note
-  let length = parseInt(input[0]);
-  if (length === NaN || length>128) {
-    console.log("error 0");
-    return false;
+  let octave = null;
+  let note = null;
+  let duration = null;
+  if (input[input.length - 1] === 'P') {
+    let noteAndOctaveLength = 1;
+    duration = parseInt(input.slice(0, -1));
+    if (!duration) {
+      console.log("error 1");
+      return null;
+    } else {
+      return {
+        note: 'P',
+        duration: duration
+      };
+    }
   }
 
-  let note = null;
-  let octave = null;
-
-  /// Note of length 2 should be only a pause
-  if (input.length === 2) {
-    if (input[1].toUpperCase() != "P") {
-      console.log("error 1");
-      return false;
-    } else {
-      return true;
-    }
-  } else if (input.length === 3) {
-    note = input[1].toUpperCase();
-    octave = parseInt(input[2]);
-  } else if (input.length === 4) {
-    note = (input[1] + input[2]).toUpperCase();
-    octave = parseInt(input[3]);
-  } else {
+  octave = parseInt(input.slice(-1));
+  if (!octave) {
     console.log("error 2");
-    return false;
+    return null;
+  }
+
+  let noteAndOctaveLength = 2;
+  if (input[input.length - 2] === '#') {
+    note = input.slice(-3, -1);
+    let noteAndOctaveLength = 3;
+  } else {
+    note = input.slice(-2, -1);
   }
 
   if (!allowedNotes[note]) {
-    console.log("error 3",note);
-    return false;
+    console.log("error 3");
+    return null;
   }
 
-  if (octave > 9 || octave < 0) {
+
+  duration = parseInt(input.slice(0, input.length - noteAndOctaveLength));
+  if (!duration) {
     console.log("error 4");
-    return false;
+    return null;
   }
 
-  return true;
+  return {
+    note: note + octave,
+    duration: duration
+  };
 };
 // './audio/salamander/'
 
@@ -135,7 +140,7 @@ var defineVariables = function () {
       {
         'release' : 1,
         'baseUrl' : './audio/drums/',
-        'onload': function () {console.log("LOADED"); resolve("drums"); }
+        'onload': function () {console.log("loaded drums"); resolve("drums"); }
         // 'baseUrl' : 'https://github.com/Tonejs/tonejs.github.io/tree/master/examples/audio/salamander/'
       }).toMaster();
     });
@@ -166,7 +171,7 @@ var defineVariables = function () {
       {
         'release' : 1,
         'baseUrl' : './audio/chorusfemale/',
-        'onload': function () {console.log("LOADED"); resolve("chorusfemale"); }
+        'onload': function () {console.log("loaded chorusfemale"); resolve("chorusfemale"); }
         // 'baseUrl' : 'https://github.com/Tonejs/tonejs.github.io/tree/master/examples/audio/salamander/'
       }).toMaster();
     });
@@ -232,7 +237,7 @@ var defineVariables = function () {
       {
   			'release' : 1,
         'baseUrl' : './audio/chorusmale/',
-        'onload': function () {console.log("LOADED"); resolve("chorusmale"); }
+        'onload': function () {console.log("loaded chorusmale"); resolve("chorusmale"); }
   			// 'baseUrl' : 'https://github.com/Tonejs/tonejs.github.io/tree/master/examples/audio/salamander/'
   		}).toMaster();
     });
@@ -299,7 +304,7 @@ var defineVariables = function () {
       {
   			'release' : 1,
         'baseUrl' : './audio/dualstrings/',
-        'onload': function () {console.log("LOADED"); resolve("chorusfemale"); }
+        'onload': function () {console.log("loaded dualstrings"); resolve("chorusfemale"); }
   			// 'baseUrl' : 'https://github.com/Tonejs/tonejs.github.io/tree/master/examples/audio/salamander/'
   		}).toMaster();
     });
@@ -361,7 +366,7 @@ var defineVariables = function () {
       {
   			'release' : 1,
         'baseUrl' : './audio/strings/',
-        'onload': function () {console.log("LOADED"); resolve("strings"); }
+        'onload': function () {console.log("loaded strings"); resolve("strings"); }
   			// 'baseUrl' : 'https://github.com/Tonejs/tonejs.github.io/tree/master/examples/audio/salamander/'
   		}).toMaster();
     });
@@ -423,7 +428,7 @@ var defineVariables = function () {
       {
   			'release' : 1,
         'baseUrl' : './audio/cello/',
-        'onload': function () {console.log("LOADED"); resolve("cello"); }
+        'onload': function () {console.log("loaded cello"); resolve("cello"); }
   			// 'baseUrl' : 'https://github.com/Tonejs/tonejs.github.io/tree/master/examples/audio/salamander/'
   		}).toMaster();
     });
@@ -528,7 +533,7 @@ var defineVariables = function () {
       {
   			'release' : 1,
         'baseUrl' : './audio/salamander/',
-        'onload': function () {console.log("PIANO LOADED"); resolve("piano");}
+        'onload': function () {console.log("loaded piano"); resolve("piano");}
   			// 'baseUrl' : 'https://github.com/Tonejs/tonejs.github.io/tree/master/examples/audio/salamander/'
   		}).toMaster();
     });
@@ -579,7 +584,6 @@ var defineVariables = function () {
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
   if (info.status === 'complete') {
     defineVariables();
-    console.log("ALL LOADED");
   }
 });
 
@@ -595,23 +599,23 @@ chrome.runtime.onMessage.addListener(
       Tone.Transport.cancel();
       Tone.Transport.seconds = 0;
 
-      console.log("playing");
+      // console.log("playing");
 
       let orderedMelodies = {};
       Object.keys(request.message.melodies).sort().forEach(function(key) {
         orderedMelodies[key] = request.message.melodies[key];
       });
 
-      console.log("ordered = ", orderedMelodies);
+      // console.log("ordered = ", orderedMelodies);
       let duration = 0;
       let partDelay = 0;
       let incrementDelay = 0;
       for (let part in orderedMelodies) {
-        console.log("part = ". part);
+        // console.log("part = ", part);
         // let inst = new Tone.Synth();
 
         for (let x=0; x<orderedMelodies[part].length; ++x) {
-          console.log("x = ", x);
+          // console.log("x = ", x);
           // let synth = new Tone.PolySynth(orderedMelodies[part].length, Tone.Synth).toMaster();
 
           // synth.triggerAttackRelease("C4", "8n");
@@ -629,20 +633,22 @@ chrome.runtime.onMessage.addListener(
 
           let normilizedMelody = [];
           for (let i = 2; i<melody.length; ++i) {
-            if (!checkNote(melody[i])) {
+            let noteInfo = parseNote(melody[i]);
+            if (!noteInfo) {
               continue;
             }
-            let note = melody[i].slice(1);
+
+            let note = noteInfo.note;
 
             let obj = {
               time: delay,
               note: note,
-              duration: melody[i][0] + "n",
+              duration: noteInfo.duration + "n",
               velocity: 1
             }
 
             normilizedMelody.push(obj);
-            delay += Tone.Time(melody[i][0] + "n").toSeconds();
+            delay += Tone.Time(noteInfo.duration + "n").toSeconds();
           }
 
           let part1 = new Tone.Part(function(time, value) {
@@ -651,12 +657,12 @@ chrome.runtime.onMessage.addListener(
             }
           }, normilizedMelody ).start(partDelay);
           // part1.loop = 1;
-          console.log(part1);
+          // console.log(part1);
 
           if (x === 0) {
             incrementDelay = delay;
           }
-          console.log("adding", incrementDelay);
+          // console.log("adding", incrementDelay);
         }
         partDelay += incrementDelay;
       }
@@ -675,27 +681,27 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (request.message.code === "stop"){
-      console.log("stop...");
-      console.log(Tone.Transport.ticks);
-      console.log(Tone.Transport.state);
-      console.log(Tone.Transport.seconds);
-      console.log(Tone.Transport.progress);
-      console.log(Tone.Transport.position);
-      console.log("----------------");
+      // console.log("stop...");
+      // console.log(Tone.Transport.ticks);
+      // console.log(Tone.Transport.state);
+      // console.log(Tone.Transport.seconds);
+      // console.log(Tone.Transport.progress);
+      // console.log(Tone.Transport.position);
+      // console.log("----------------");
       // console.log(Tone.context);
       // if (Tone.context) {
         Tone.Transport.stop();
         Tone.Transport.cancel();
-      console.log(Tone.Transport.ticks);
-      console.log(Tone.Transport.state);
-      console.log(Tone.Transport.seconds);
-      console.log(Tone.Transport.progress);
-      console.log(Tone.Transport.position);
+      // console.log(Tone.Transport.ticks);
+      // console.log(Tone.Transport.state);
+      // console.log(Tone.Transport.seconds);
+      // console.log(Tone.Transport.progress);
+      // console.log(Tone.Transport.position);
       sendResponse({message: "Stopped"});
     }
 
     if (request.message.code === "listeners"){
-      console.log("req...", request);
+      // console.log("req...", request);
       // console.log("sender...", sender);
       // console.log("id...", sender.id);
 

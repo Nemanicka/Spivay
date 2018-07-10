@@ -35,7 +35,7 @@ function ReplyModifier() {
     if (inputFooters.length == 1) {
       var inputFooter = inputFooters[0];
       if (!$(inputFooter).hasClass("nightingaled")) {
-        console.log("modify reply");
+        // console.log("modify reply");
         modifiedReply = true;
         $(inputFooter).addClass("nightingaled");
         $(inputFooter).append(playFooterHtml + stopFooterHtml);
@@ -51,9 +51,9 @@ function ReplyModifier() {
   }
 
   if (modifiedReply) {
-    console.log("modifiedReply res = ", modifiedReply);
+    // console.log("modifiedReply res = ", modifiedReply);
     chrome.runtime.sendMessage({message: {code: "listeners"}, function (response) {
-      console.log("res = ", response);
+      // console.log("res = ", response);
       }
     });
   }
@@ -62,7 +62,7 @@ function ReplyModifier() {
 ReplyModifier();
 
 chrome.runtime.sendMessage({message: {code: "listeners"}, function (response) {
-  console.log("res = ", response)
+  // console.log("res = ", response)
   }
 });
 
@@ -74,7 +74,7 @@ function DOMModificationHandler() {
 }
 
 function permalinkWatcher(){
-  console.log("MODIFIED 1");
+  // console.log("MODIFIED 1");
   // $('#permalink-overlay').('dblclick', permalinkWatcher);
   setTimeout(function() {
     modify();
@@ -111,7 +111,7 @@ function replyWatcher(){
     if (replyContext.length === 1) {
       $(replyContext[0]).one('DOMSubtreeModified.event1', replyWatcher);
       chrome.runtime.sendMessage({message: {code: "listeners"}, function (response) {
-        console.log("res = ", response);
+        // console.log("res = ", response);
         }
       });
     }
@@ -149,7 +149,7 @@ function modify() {
     // console.log("modified");
 
     chrome.runtime.sendMessage({message: {code: "listeners"}, function (response) {
-      console.log("res = ", response);
+      // console.log("res = ", response);
       }
     });
   }

@@ -1,7 +1,7 @@
 {
-  "name": "Constant Context",
-  "description" : "Highlights elements with keywords on developer.chrome",
-  "version": "1.0",
+  "name": "Spivay",
+  "description" : "Tweet music! Turn your tweets into songs!",
+  "version": "1.2",
   "page_action": {
   "default_icon": {
     "16": "images/nightingale-16x16.png",
@@ -19,7 +19,6 @@
     "https://twitter.com/*",
     "https://publish.twitter.com/*",
     "https://platform.twitter.com/*",
-    "https://github.com/*",
     "tabs",
     "activeTab",
     "storage",
