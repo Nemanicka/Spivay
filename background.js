@@ -433,68 +433,6 @@ var defineVariables = function () {
   		}).toMaster();
     });
 
-
-    //
-    // var celloPromise = new Promise((resolve, reject) => {
-    // instruments["cello"] = new Tone.Sampler({
-    //       'A2' : 'A2.[wav]',
-    //       'A3' : 'A3.[wav]',
-    //       'A4' : 'A4.[wav]',
-    //       'A5' : 'A5.[wav]',
-    // 			// 'A#2' : 'As2.[mp3]',
-    //       // 'A#3' : 'As3.[mp3]',
-    //       // 'A#4' : 'As4.[mp3]',
-    //       // 'A#5' : 'As5.[mp3]',
-    // 			// // 'B2' : 'B2.[mp3]',
-    //       // // 'B3' : 'B3.[mp3]',
-    //       // // 'B4' : 'B4.[mp3]',
-    //       // // 'B5' : 'B5.[mp3]'
-    // 			'C2' : 'C2.[wav]',
-    //       'C3' : 'C3.[wav]',
-    //       'C4' : 'C4.[wav]',
-    //       'C5' : 'C5.[wav]',
-    //       // 'C6' : 'C6.[mp3]',
-    // 			// 'C#2' : 'Cs2.[mp3]',
-    //       // 'C#3' : 'Cs3.[mp3]',
-    //       // 'C#4' : 'Cs4.[mp3]',
-    //       // 'C#5' : 'Cs5.[mp3]',
-    // 			// 'D2' : 'D2.[mp3]',
-    //       // 'D3' : 'D3.[mp3]',
-    //       // 'D4' : 'D4.[mp3]',
-    //       // // 'D5' : 'D5.[mp3]',
-    // 			'D#2' : 'Ds2.[wav]',
-    //       'D#3' : 'Ds3.[wav]',
-    //       'D#4' : 'Ds4.[wav]',
-    //       'D#5' : 'Ds5.[wav]',
-    // 			// 'E2' : 'E2.[mp3]',
-    //       // 'E3' : 'E3.[mp3]',
-    //       // 'E4' : 'E4.[mp3]',
-    //       // 'E5' : 'E5.[mp3]',
-    // 			// 'F2' : 'F2.[mp3]',
-    //       // 'F3' : 'F3.[mp3]',
-    //       // 'F4' : 'F4.[mp3]',
-    //       // 'F5' : 'F5.[mp3]',
-    // 			'F#2' : 'Fs2.[wav]',
-    //       'F#3' : 'Fs3.[wav]',
-    //       'F#4' : 'Fs4.[wav]',
-    //       'F#5' : 'Fs5.[wav]',
-    // 			// // 'G2' : 'G2.[mp3]',
-    //       // // 'G3' : 'G3.[mp3]',
-    //       // // 'G4' : 'G4.[mp3]',
-    //       // // 'G5' : 'G5.[mp3]'
-    // 			// 'G#2' : 'Gs2.[mp3]',
-    //       // 'G#3' : 'Gs3.[mp3]',
-    //       // 'G#4' : 'Gs4.[mp3]',
-    //       // 'G#5' : 'Gs5.[mp3]'
-    // 		}, //function () {},
-    //     {
-    // 			'release' : 1,
-    //       'baseUrl' : './audio/cello/cello/',
-    //       'onload': function () {console.log("LOADED"); resolve("cello"); }
-    // 			// 'baseUrl' : 'https://github.com/Tonejs/tonejs.github.io/tree/master/examples/audio/salamander/'
-    // 		}).toMaster();
-    //   });
-
   loadBuffersPromises.push(celloPromise);
 
   let pianoPromise = new Promise((resolve, reject) => {
@@ -537,55 +475,22 @@ var defineVariables = function () {
   			// 'baseUrl' : 'https://github.com/Tonejs/tonejs.github.io/tree/master/examples/audio/salamander/'
   		}).toMaster();
     });
-  //
-  // let pianoPromise = new Promise((resolve, reject) => {
-  // instruments["piano"] = new Tone.Sampler({
-  //   'A1' : 'piano-p-a1.wav',
-  //   'A2' : 'piano-p-a2.wav',
-  //   'A3' : 'piano-p-a3.wav',
-  //   'A4' : 'piano-p-a4.wav',
-  //   'A5' : 'piano-p-a5.wav',
-  //   'A6' : 'piano-p-a6.wav',
-  //   'A7' : 'piano-p-a7.wav',
-  //   'C1' : 'piano-p-c1.wav',
-  //   'C2' : 'piano-p-c2.wav',
-  //   'C3' : 'piano-p-c3.wav',
-  //   'C4' : 'piano-p-c4.wav',
-  //   'C5' : 'piano-p-c5.wav',
-  //   'C6' : 'piano-p-c6.wav',
-  //   'C7' : 'piano-p-c7.wav',
-  //   'C8' : 'piano-p-c8.wav',
-  //   'D#1' : 'piano-p-ds1.wav',
-  //   'D#2' : 'piano-p-ds2.wav',
-  //   'D#3' : 'piano-p-ds3.wav',
-  //   'D#4' : 'piano-p-ds4.wav',
-  //   'D#5' : 'piano-p-ds5.wav',
-  //   'D#6' : 'piano-p-ds6.wav',
-  //   'D#7' : 'piano-p-ds7.wav',
-  //   'F#1' : 'piano-p-fs1.wav',
-  //   'F#2' : 'piano-p-fs2.wav',
-  //   'F#3' : 'piano-p-fs3.wav',
-  //   'F#4' : 'piano-p-fs4.wav',
-  //   'F#5' : 'piano-p-fs5.wav',
-  //   'F#6' : 'piano-p-fs6.wav',
-  //   'F#7' : 'piano-p-fs7.wav',
-  // 		}, //function () {},
-  //     {
-  // 			'release' : 1,
-  //       'baseUrl' : './audio/salamander/piano/',
-  //       'onload': function () {console.log("PIANO LOADED"); resolve("piano");}
-  // 			// 'baseUrl' : 'https://github.com/Tonejs/tonejs.github.io/tree/master/examples/audio/salamander/'
-  // 		}).toMaster();
-  //   });
 
     loadBuffersPromises.push(pianoPromise);
 };
 
-chrome.tabs.onUpdated.addListener(function (tabId, info) {
-  if (info.status === 'complete') {
-    defineVariables();
+chrome.webNavigation.onCompleted.addListener(function(info) {
+  console.log("info url = ", info);
+  if (info.url.indexOf('https://twitter.com/i/') !== -1) {
+    return;
   }
-});
+  console.log("define", info);
+  defineVariables();
+  chrome.runtime.sendMessage({message: "reloadBackgrounds", function (response) {
+    // console.log("res = ", response);
+    }
+  });
+}, {url: [{urlMatches : 'https://twitter.com/'}]});
 
 chrome.runtime.onMessage.addListener(
 
@@ -681,15 +586,7 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (request.message.code === "stop"){
-      // console.log("stop...");
-      // console.log(Tone.Transport.ticks);
-      // console.log(Tone.Transport.state);
-      // console.log(Tone.Transport.seconds);
-      // console.log(Tone.Transport.progress);
-      // console.log(Tone.Transport.position);
-      // console.log("----------------");
-      // console.log(Tone.context);
-      // if (Tone.context) {
+
         Tone.Transport.stop();
         Tone.Transport.cancel();
       // console.log(Tone.Transport.ticks);

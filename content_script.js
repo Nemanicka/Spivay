@@ -24,6 +24,49 @@ for (var i=0; i<inputBoxes.length; ++i) {
   }
 }
 
+var inputBoxes = $('.modal-tweet-form-container');
+for (var i=0; i<inputBoxes.length; ++i) {
+  var input = inputBoxes[i];
+  var inputFooters = $(input).find(".tweet-box-extras");
+
+  if (inputFooters.length == 1) {
+    var inputFooter = inputFooters[0];
+    if (!$(inputFooter).hasClass("nightingaled")) {
+      $(inputFooter).addClass("nightingaled");
+      $(inputFooter).append(playFooterHtml + stopFooterHtml);
+    }
+  }
+}
+
+function timelineTweetBoxModifier() {
+  var inputBoxes = $('.timeline-tweet-box');
+  let modified = false;
+  for (var i=0; i<inputBoxes.length; ++i) {
+    let input = inputBoxes[i];
+    let inputFooters = $(input).find(".tweet-box-extras");
+
+    if (inputFooters.length == 1) {
+      let inputFooter = inputFooters[0];
+      if (!$(inputFooter).hasClass("nightingaled")) {
+        modified = true;
+        $(inputFooter).addClass("nightingaled");
+        $(inputFooter).append(playFooterHtml + stopFooterHtml);
+      }
+    }
+  }
+
+  if (modified) {
+    // console.log("modified");
+
+    chrome.runtime.sendMessage({message: {code: "listeners"}, function (response) {
+      // console.log("res = ", response);
+      }
+    });
+  }
+}
+
+timelineTweetBoxModifier();
+
 function ReplyModifier() {
   let inlineInputBoxes = $('.inline-reply-tweetbox-container');
   let modifiedReply = false;
@@ -61,14 +104,10 @@ function ReplyModifier() {
 
 ReplyModifier();
 
-chrome.runtime.sendMessage({message: {code: "listeners"}, function (response) {
-  // console.log("res = ", response)
-  }
-});
-
 function DOMModificationHandler() {
   setTimeout(function() {
     modify();
+    timelineTweetBoxModifier();
     $('#timeline').one('DOMSubtreeModified.event1', DOMModificationHandler);
   }, 10);
 }

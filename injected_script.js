@@ -134,8 +134,10 @@ var getTweetsParams = function (url) {
 }
 
 
+
+
+
 var inputReplyBoxes = document.getElementsByClassName('inline-reply-tweetbox-container');
-// console.log("input reply boxes = ", inputReplyBoxes.length);
 for (let i=0; i<inputReplyBoxes.length; ++i) {
   // let id = inputBoxes[i].getAttribute("id");
   let userHolder = inputReplyBoxes[i].getElementsByClassName("username u-dir u-textTruncate");
@@ -230,97 +232,145 @@ if (dialogReplyContext.length === 1 && (dialogReplyContext[0].className.indexOf(
   }
 }
 
+var dialogReplyContext = document.getElementsByClassName('TweetstormDialog-reply-context');
+// console.log("reply contexts = ", dialogReplyContext.length);
 
-var inputBoxes = document.getElementsByClassName('TweetstormDialog-tweet-box');
-// console.log("regular box size = ", inputBoxes.length);
-for (let i=0; i<inputBoxes.length; ++i) {
-  let id = inputBoxes[i].getAttribute("id");
-  let btns = inputBoxes[i].getElementsByClassName("nightPlay");
+var replyParams = {
+  texts: []
+};
 
-
-  if (btns.length != 3) {
-    continue;
-  }
-
-  let stopBtns = btns[0].parentElement.parentElement.children[1].children;
-  // console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);
-  if (stopBtns.length != 1 || (stopBtns[0].className.indexOf("nightListening") != -1)) {
-    // console.log("continue");
-    continue;
-  }
-
-  stopBtns[0].classList.add("nightListening");
-
-  stopBtns[0].addEventListener('click', function() {
-    chrome.runtime.sendMessage({message: {code: "stop"}}, function (response) {
-      // console.log("sent stop code");
-      stopBtns[0].parentElement.parentElement.children[0].hidden = false;
-      stopBtns[0].parentElement.parentElement.children[1].hidden = true;
-      if (backToPlay) {
-        clearTimeout(backToPlay);
-      }
-    });
-  });
-
-  for (let k=0; k<btns.length; ++k) {
-    if (btns[k].className.indexOf("listening") != -1) {
-      continue;
-    }
-    // console.log(btns[k].className);
-
-    btns[k].classList.add("listening");
-
-    btns[k].addEventListener('click', function() {
-      let texts = [];
-      let newTweets = document.getElementsByClassName('TweetstormDialog-tweet-box');
-      let params = {
-        texts: [],
-        self: null,
-        mode: 0
-      };
-
-      if (btns[k].className.indexOf("nightPlayAll") != -1) {
-        params.mode = 1;
-      }
-
-      if (btns[k].className.indexOf("nightPlayPart") != -1) {
-        params.mode = 2;
-      }
-
-      if (btns[k].className.indexOf("nightPlaySelf") != -1) {
-        params.mode = 3;
-      }
-
-      for (let j=0; j<newTweets.length; ++j) {
-        let textareas = newTweets[j].getElementsByClassName("tweet-box");
-        let tweetId = newTweets[j].getAttribute("id");
-
-        if (textareas.length != 1) continue;
-
-        if (!textareas[0] ||
-            !textareas[0].children ||
-            !textareas[0].children[0])
-            continue;
-
-        let text = textareas[0].children[0].innerText;
-
-        if (tweetId === id) {
-          // console.log("ID = ", id, tweetId, text);
-          params.self = text;
-        }
-
-        texts.push(text);
-      }
-
-      params.texts = replyParams.texts.concat(texts);
-      params.element =  btns[0].parentElement.parentElement;
-
-      parseTexts(params);
-    });
+if (dialogReplyContext.length === 1 && (dialogReplyContext[0].className.indexOf("hidden") == -1)) {
+  let replyTweet = dialogReplyContext[0].getElementsByClassName("tweet");
+  // console.log("reply tweets = ", replyTweet.length);
+  if (replyTweet.length === 1) {
+    let uri = "https://twitter.com" + replyTweet[0].getAttribute("data-permalink-path");
+    replyParams = getTweetsParams(uri);
   }
 }
 
+var listenBoxes = function (className, forceLoadReplyTweets) {
+let inputBoxes = document.getElementsByClassName(className);
+// console.log("regular box size = ", inputBoxes.length);
+  for (let i=0; i<inputBoxes.length; ++i) {
+    let id = inputBoxes[i].getAttribute("id");
+    let btns = inputBoxes[i].getElementsByClassName("nightPlay");
 
+
+    if (btns.length != 3) {
+      continue;
+    }
+
+    let stopBtns = btns[0].parentElement.parentElement.children[1].children;
+    // console.log("stop = ", btns[0].parentElement.parentElement.children[1].children);
+    if (stopBtns.length != 1 || (stopBtns[0].className.indexOf("nightListening") != -1)) {
+      // console.log("continue");
+      continue;
+    }
+
+    stopBtns[0].classList.add("nightListening");
+
+    stopBtns[0].addEventListener('click', function() {
+      chrome.runtime.sendMessage({message: {code: "stop"}}, function (response) {
+        // console.log("sent stop code");
+        stopBtns[0].parentElement.parentElement.children[0].hidden = false;
+        stopBtns[0].parentElement.parentElement.children[1].hidden = true;
+        if (backToPlay) {
+          clearTimeout(backToPlay);
+        }
+      });
+    });
+
+    for (let k=0; k<btns.length; ++k) {
+      if (btns[k].className.indexOf("listening") != -1) {
+        continue;
+      }
+      // console.log(btns[k].className);
+
+      btns[k].classList.add("listening");
+
+      btns[k].addEventListener('click', function() {
+        let texts = [];
+        let newTweets = document.getElementsByClassName(className);
+        let params = {
+          texts: [],
+          self: null,
+          mode: 0
+        };
+
+        if (forceLoadReplyTweets) {
+          var globalTweetDialog = document.getElementById('global-tweet-dialog-body');
+          console.log(globalTweetDialog, globalTweetDialog.length);
+          var globalTweetReplyParams = {
+            texts: []
+          };
+
+          if (globalTweetDialog) {
+            console.log("adding params");
+            let replyTweet = globalTweetDialog.getElementsByClassName("tweet");
+            // console.log("reply tweets = ", replyTweet.length);
+            if (replyTweet.length === 1) {
+              let uri = "https://twitter.com" + replyTweet[0].getAttribute("data-permalink-path");
+              globalTweetReplyParams = getTweetsParams(uri);
+              console.log("getting tweets", globalTweetReplyParams);
+            }
+          }
+        }
+
+        if (btns[k].className.indexOf("nightPlayAll") != -1) {
+          console.log("ALL");
+          params.mode = 1;
+        }
+
+        if (btns[k].className.indexOf("nightPlayPart") != -1) {
+          console.log("PART");
+          params.mode = 2;
+        }
+
+        if (btns[k].className.indexOf("nightPlaySelf") != -1) {
+          console.log("SELF");
+          params.mode = 3;
+        }
+
+        for (let j=0; j<newTweets.length; ++j) {
+          let textareas = newTweets[j].getElementsByClassName("tweet-box rich-editor");
+          let tweetId = newTweets[j].getAttribute("id");
+
+          if (textareas.length != 1) {
+
+            continue;
+          }
+
+          if (!textareas[0] ||
+              !textareas[0].children ||
+              !textareas[0].children[0])
+              continue;
+
+          let text = textareas[0].children[0].innerText;
+          if (tweetId === id) {
+            // console.log("ID = ", id, tweetId, text);
+            params.self = text;
+          }
+
+          texts.push(text);
+        }
+        console.log("params = ", globalTweetReplyParams);
+        if (globalTweetReplyParams && globalTweetReplyParams.texts.length) {
+          params.texts = globalTweetReplyParams.texts.concat(texts);
+          console.log("final params = ", params);
+        } else {
+          params.texts = replyParams.texts.concat(texts);
+        }
+        params.element =  btns[0].parentElement.parentElement;
+
+        parseTexts(params);
+      });
+    }
+  }
+}
+
+listenBoxes("TweetstormDialog-tweet-box");
+listenBoxes("timeline-tweet-box");
+listenBoxes("modal-tweet-form-container", true);
 
 var inputTweetBoxes = document.getElementsByClassName('tweet');
 for (let i=0; i<inputTweetBoxes.length; ++i) {
