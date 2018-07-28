@@ -64,7 +64,7 @@ var parseNote = function (input) {
   }
 
   octave = parseInt(input.slice(-1));
-  if (!octave) {
+  if (!octave && octave !== 0) {
     console.log("error 2");
     return null;
   }

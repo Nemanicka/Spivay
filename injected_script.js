@@ -122,12 +122,12 @@ var getTweetsParams = function (url) {
   let texts = [];
   for (let i=0; i<currentBox.length; ++i) {
     let text = currentBox[i].innerText;
-    texts.push(text);
+    texts.push(text.trim());
   }
 
   for (let i=0; i<replyBoxes.length; ++i) {
     let text = replyBoxes[i].innerText;
-    texts.push(text);
+    texts.push(text.trim());
   }
 
   return {texts: texts, self: null, mode: 1};
@@ -209,8 +209,8 @@ for (let i=0; i<inputReplyBoxes.length; ++i) {
 
       params.element = btns[0].parentElement.parentElement;
       // console.log("tweetText", tweetText);
-      params.self = tweetText;
-      params.texts.push(tweetText);
+      params.self = tweetText.trim();
+      params.texts.push(tweetText.trim());
       parseTexts(params);
     });
   }
@@ -348,10 +348,10 @@ let inputBoxes = document.getElementsByClassName(className);
           let text = textareas[0].children[0].innerText;
           if (tweetId === id) {
             // console.log("ID = ", id, tweetId, text);
-            params.self = text;
+            params.self = text.trim();
           }
 
-          texts.push(text);
+          texts.push(text.trim());
         }
         console.log("params = ", globalTweetReplyParams);
         if (globalTweetReplyParams && globalTweetReplyParams.texts.length) {
